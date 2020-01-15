@@ -235,6 +235,7 @@ a single column of a data frame separately using a command like
 ```{r view-clarity}
 
 diamonds$clarity[1:100]
+diamonds$clarity[2]
 ```
 
 This command will only show the value of clarity of the diamonds measured in this 
@@ -250,7 +251,7 @@ What command would you use to extract just the data on diamond length?
 </div>
 
 ```{r extract-length-of-diamonds}
-# type your code for the Question 2 here, and Knit
+diamonds$x
 diamonds$x[1:10]
 ```
 
@@ -268,8 +269,10 @@ R has some powerful functions for making graphics. We can create a simple plot
 of the price of diamonds by their weight measured in carats with the command
 
 ```{r plot-price-vs-carat}
-ggplot(data = diamonds, aes(x = carat, y = price)) +
-  geom_point()
+ggplot(data = diamonds, aes(x = carat, y = price, color = clarity)) +
+  geom_point() + geom_smooth()
+
+#there are different types of geoms you can use to do different things to the plot
 ```
 
 Before we review the code for this plot, let's summarize the trends we see in the 
@@ -329,6 +332,7 @@ to get the value for that first one. We could repeat this once for each
 stone, but there is a faster way. If we add the vector for each, R will compute all sums simultaneously.
 
 ```{r calc-total-dims-all}
+#stores new vector called sum_xyz
 sum_xyz <- diamonds$x + diamonds$y + diamonds$z
 sum_xyz[1:10]
 ```
@@ -343,6 +347,7 @@ We'll be using this new vector to generate some plots, so we'll want to save it
 as a permanent column in our data frame.
 
 ```{r calc-total-dims-again}
+#pipes diamonds through function mutate; adds new variable "total" to dataset
 diamonds <- diamonds %>%
   mutate(total = x + y + z)
 ```
@@ -388,6 +393,11 @@ of a scatter plot. You want both? Just layer them on:
 ggplot(data = diamonds, aes(x = table, y = total)) +
   geom_line() +
   geom_point()
+
+
+ggplot(data = diamonds, aes(x = carat, y = price, color = color)) +
+  geom_point() +
+  facet_wrap( ~ clarity)
 ```
 
 <div class="exercise">
@@ -402,7 +412,9 @@ Now, with your partner, play with mutate and piping and create a plot of interes
 
 ```{r plot-of-something-interesting}
 # type your code for the Exercise here, and Knit
-
+ggplot(data = diamonds, aes(x = carat, y = price, color = color)) +
+  geom_point() +
+  facet_wrap( ~ clarity)
 
 
 ```
@@ -415,6 +427,8 @@ the y dimension for these stones with the expression
 ```{r x-greater-than-y}
 diamonds <- diamonds %>%
   mutate(more_x = x > y)
+
+#adds another variable column to the dataset
 ```
 
 This command add a new variable to the `diamonds` data frame containing the values
@@ -432,6 +446,9 @@ with many of them.
 
 We can use just part of the dataset by filtering.   Here, we are going to filter on a particular value of cut and color and plot price vs carat.
 ```{r try-filtering-diamonds}
+
+#filters data so you can only look at smth that fits those qualifications; makes new data subset
+
 fair_diamonds <- diamonds %>%
   filter(cut == "Fair" & color =="G")
 ggplot(data = fair_diamonds, aes(x = price, y = carat)) +
@@ -444,6 +461,9 @@ Let's get the means of the stone prices.
 
 ```{r try-averaging-diamond-prices}
 diamonds %>%
+  summarise(mean = mean(price), sd = sd(price), median = median(price))
+
+diamonds %>% group_by(cut) %>%
   summarise(mean = mean(price), sd = sd(price), median = median(price))
 ```
 
